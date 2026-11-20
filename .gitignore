@@ -1,0 +1,38 @@
+# Operating System
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Logs & Temporary Backups
+*.log
+*.tmp
+*.bak
+*.backup
+scratch/
+
+# Archives & Temporary Raw Assets
+*.zip
+assets/audio/raw/
+assets/raw_sources/
+
+# Debug and Verification Screenshots
+clean_*.png
+final_*.png
+snap_*.png
+verify_*.png
+verified_*.png
+assets/so101_*_test.png
+assets/so101_mid_trajectory.png
+assets/so101_reset_home_test.png
+assets/so101_full_wide.png
+assets/so101_full_card_home.png
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+demo.html
+features_reference.html
+*.py
+assets/audio/*.wav
+assets/audio/*.ogg
