@@ -238,6 +238,7 @@
       position: relative;
       width: 100%;
       height: 960vh; /* 16 Eras smooth progression */
+      height: 960dvh; /* dynamic vh for iOS Safari */
       background: var(--bg-void);
     }
 
@@ -247,8 +248,13 @@
       left: 0;
       width: 100vw;
       height: 100vh;
+      height: 100dvh; /* dynamic vh for iOS Safari */
       overflow: hidden;
       z-index: 10;
+      /* Ensure GPU compositing layer for smooth mobile sticky */
+      will-change: transform;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
     }
 
     #evolution-webgl-canvas {
@@ -257,6 +263,8 @@
       width: 100%;
       height: 100%;
       display: block;
+      /* Prevent browser touch hijack on canvas - let scroll pass through */
+      touch-action: pan-y;
     }
 
     /* Evolution HUD Overlays */
@@ -1991,6 +1999,21 @@
         font-size: 10px;
         padding: 5px 10px;
         white-space: nowrap;
+      }
+
+      /* 16-Era Scroll Track — mobile sticky viewport fix */
+      .evolution-scroll-track {
+        height: 960dvh;
+      }
+      .evolution-viewport-sticky {
+        top: 52px; /* mobile nav height */
+        height: calc(100dvh - 52px);
+        /* Force a new stacking context so sticky fires inside overflow:hidden parent */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
+      #evolution-webgl-canvas {
+        touch-action: pan-y;
       }
 
       /* 16-Era Narrative Overlay & Scrubber */
@@ -4064,6 +4087,17 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
         evoRenderer.setSize(window.innerWidth, window.innerHeight);
         evoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
+        // On mobile, size renderer to actual container dimensions immediately
+        if (evoCanvas.parentElement) {
+          const cW = evoCanvas.parentElement.clientWidth;
+          const cH = evoCanvas.parentElement.clientHeight;
+          if (cW > 10 && cH > 10) {
+            evoCamera.aspect = cW / cH;
+            evoCamera.updateProjectionMatrix();
+            evoRenderer.setSize(cW, cH);
+          }
+        }
+
         // Global Ambient & Key Atmosphere Lights
         const ambLight = new THREE.AmbientLight(0x101622, 1.4);
         evoScene.add(ambLight);
@@ -4569,6 +4603,25 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
           mouseY = (e.clientY / window.innerHeight) * 2 - 1;
         });
 
+        // Mobile Touch Parallax (subtle X/Y tilt on touch move)
+        window.addEventListener('touchmove', (e) => {
+          if (e.touches && e.touches.length > 0) {
+            const t = e.touches[0];
+            mouseX = (t.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (t.clientY / window.innerHeight) * 2 - 1;
+          }
+        }, { passive: true });
+
+        // Device Orientation Parallax for mobile gyro tilt
+        if (window.DeviceOrientationEvent) {
+          window.addEventListener('deviceorientation', (e) => {
+            if (e.gamma !== null && e.beta !== null) {
+              mouseX = Math.max(-1, Math.min(1, e.gamma / 30));  // gamma: left-right tilt ±30°
+              mouseY = Math.max(-1, Math.min(1, (e.beta - 45) / 30)); // beta: fwd-back tilt
+            }
+          }, { passive: true });
+        }
+
         // Evolution Render Loop
         function renderEvolution() {
           requestAnimationFrame(renderEvolution);
@@ -4783,10 +4836,29 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
         renderEvolution();
 
         window.addEventListener('resize', () => {
-          evoCamera.aspect = window.innerWidth / window.innerHeight;
+          const W = window.innerWidth;
+          const H = window.innerHeight;
+          evoCamera.aspect = W / H;
           evoCamera.updateProjectionMatrix();
-          evoRenderer.setSize(window.innerWidth, window.innerHeight);
+          evoRenderer.setSize(W, H);
+          evoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         });
+
+        // ResizeObserver: handles mobile orientation changes & browser chrome resize
+        if (typeof ResizeObserver !== 'undefined') {
+          const evoRO = new ResizeObserver(() => {
+            const container = evoCanvas.parentElement;
+            if (!container) return;
+            const W = container.clientWidth;
+            const H = container.clientHeight;
+            if (W < 10 || H < 10) return;
+            evoCamera.aspect = W / H;
+            evoCamera.updateProjectionMatrix();
+            evoRenderer.setSize(W, H);
+            evoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          });
+          evoRO.observe(evoCanvas.parentElement);
+        }
       }
       initEvolutionEngine();
       window.__DEBUG_EVO = {
@@ -4806,8 +4878,17 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
       function onEvolutionScroll() {
         if (!scrollTrack) return;
         const rect = scrollTrack.getBoundingClientRect();
-        const totalDist = scrollTrack.offsetHeight - window.innerHeight;
-        const progress = Math.max(0, Math.min(1, -rect.top / totalDist));
+        // On mobile the sticky viewport is offset by the nav (52px), so the
+        // effective viewport height we travel against is the container height,
+        // not window.innerHeight.
+        const stickyContainer = document.querySelector('.evolution-viewport-sticky');
+        const viewH = stickyContainer ? stickyContainer.clientHeight : window.innerHeight;
+        const totalDist = scrollTrack.offsetHeight - viewH;
+        // rect.top is relative to the viewport top (0 = entry point of sticky)
+        // On mobile with top:52px sticky, section top enters at 52px not 0
+        const navH = stickyContainer ? parseInt(getComputedStyle(stickyContainer).top || '0', 10) : 0;
+        const scrolledIn = -(rect.top - navH);
+        const progress = Math.max(0, Math.min(1, scrolledIn / totalDist));
 
         // Camera Z spline target
         targetCamZ = 12 - (progress * 900);
