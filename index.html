@@ -66,7 +66,7 @@
       font-family: var(--font-body);
       font-size: 15px;
       line-height: 1.6;
-      overflow-x: hidden;
+      overflow-x: clip;
       max-width: 100vw;
       width: 100%;
       -webkit-text-size-adjust: 100%;
@@ -78,7 +78,7 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      overflow-x: hidden;
+      overflow-x: clip;
       max-width: 100vw;
       width: 100%;
     }
@@ -399,6 +399,50 @@
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    .era-mobile-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0, 229, 255, 0.15);
+    }
+    .era-nav-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--cyan);
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      border-radius: var(--radius-pill);
+      padding: 5px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .era-nav-btn:hover {
+      background: rgba(0, 229, 255, 0.2);
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+    .era-btn-tour {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--cyan);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+    }
+    .era-btn-tour.active {
+      background: #00e5ff;
+      color: #04060a;
+      font-weight: 800;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
     }
 
     /* Bottom Scroll Indicator */
@@ -1943,7 +1987,7 @@
     @media (max-width: 768px) {
       /* Base & Global */
       html, body {
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
         max-width: 100vw !important;
       }
       section {
@@ -2001,48 +2045,115 @@
         white-space: nowrap;
       }
 
-      /* 16-Era Scroll Track — mobile sticky viewport fix */
+      /* 16-Era Scroll Track — Calibrated for Mobile (~30dvh per era, 0 black frames) */
       .evolution-scroll-track {
-        height: 960dvh;
+        height: 500dvh;
       }
       .evolution-viewport-sticky {
+        position: sticky;
         top: 52px; /* mobile nav height */
         height: calc(100dvh - 52px);
-        /* Force a new stacking context so sticky fires inside overflow:hidden parent */
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
+        overflow: hidden;
+        z-index: 10;
       }
       #evolution-webgl-canvas {
         touch-action: pan-y;
       }
 
-      /* 16-Era Narrative Overlay & Scrubber */
+      /* 16-Era Narrative Overlay & Frosted Glass Mobile HUD */
       .evolution-hud-overlay {
-        padding: 60px 12px 18px;
+        padding: 12px 12px 14px;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        justify-content: space-between;
+        pointer-events: none;
+      }
+      .era-badge-strip {
+        pointer-events: auto;
       }
       .era-narrative-card {
+        pointer-events: auto;
         width: 100%;
         max-width: calc(100vw - 24px);
         margin: 0 auto;
-        padding: 14px 16px;
+        padding: 12px 14px;
+        background: rgba(5, 9, 16, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 229, 255, 0.35);
         border-radius: var(--radius-md);
         box-sizing: border-box;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.12);
+        max-height: 32vh;
+        overflow-y: auto;
       }
       .era-card-title {
-        font-size: 18px;
+        font-size: 17px;
         line-height: 1.25;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
+      }
+      .era-card-subtitle {
+        font-size: 11px;
+        color: var(--cyan);
+        margin-bottom: 4px;
       }
       .era-card-desc {
-        font-size: 12px;
-        line-height: 1.48;
-        margin-bottom: 8px;
+        font-size: 11.5px;
+        line-height: 1.45;
+        margin-bottom: 6px;
+        opacity: 0.92;
       }
       .era-card-milestone {
         font-size: 10px;
+        padding: 4px 8px;
+        background: rgba(0, 229, 255, 0.08);
+        border-radius: 4px;
+        border: 1px solid rgba(0, 229, 255, 0.2);
+      }
+
+      /* Mobile Interactive Navigation Controls */
+      .era-mobile-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(0, 229, 255, 0.2);
+      }
+      .era-nav-btn {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--cyan);
+        background: rgba(0, 229, 255, 0.1);
+        border: 1px solid rgba(0, 229, 255, 0.4);
+        border-radius: var(--radius-pill);
+        padding: 6px 12px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .era-nav-btn:active {
+        background: var(--cyan);
+        color: var(--bg-void);
+        transform: scale(0.96);
+      }
+      .era-btn-tour {
+        background: rgba(0, 229, 255, 0.2);
+        border-color: var(--cyan);
+        color: #ffffff;
+        box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+      }
+      .era-btn-tour.active {
+        background: #00e5ff;
+        color: #04060a;
+        font-weight: 800;
+        box-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
       }
       .evolution-timeline-scrubber {
         right: 4px;
@@ -2487,6 +2598,13 @@
             <div class="era-card-milestone" id="era-milestone">
               <span>⚡ KEY INNOVATION:</span>
               <strong style="color:#ffffff;">Discovery & Controlled Use of Fire</strong>
+            </div>
+
+            <!-- Mobile Interactive Navigation Controls -->
+            <div class="era-mobile-controls" id="era-mobile-controls">
+              <button class="era-nav-btn" id="era-btn-prev" type="button" aria-label="Previous Era">◀ PREV</button>
+              <button class="era-nav-btn era-btn-tour" id="era-btn-tour" type="button" aria-label="Auto Tour">▶ AUTO-TOUR</button>
+              <button class="era-nav-btn" id="era-btn-next" type="button" aria-label="Next Era">NEXT ▶</button>
             </div>
           </div>
 
@@ -4597,6 +4715,23 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
           eraGroups.push(group);
         });
 
+        // Responsive Aspect Fit for Cinema Screens (Edge-to-Edge on Mobile & Desktop)
+        function updateScreenAspectFit() {
+          if (!evoCamera) return;
+          const aspect = evoCamera.aspect;
+          const isPortrait = aspect < 1.0;
+          eraScreens.forEach(mesh => {
+            if (isPortrait) {
+              const scaleW = Math.max(1.0, (1.0 / aspect) * 0.72);
+              const scaleH = 1.65;
+              mesh.scale.set(scaleW, scaleH, 1.0);
+            } else {
+              mesh.scale.set(1.0, 1.0, 1.0);
+            }
+          });
+        }
+        updateScreenAspectFit();
+
         // Mouse Parallax Listener
         window.addEventListener('mousemove', (e) => {
           mouseX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -4638,39 +4773,33 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
 
           // Synchronize Active Era HUD based on camera actual position
           const currentProgress = Math.max(0, Math.min(1, (12 - evoCamera.position.z) / 900));
+          const floatIdx = currentProgress * 15;
+          const lowerIdx = Math.min(15, Math.floor(floatIdx));
+          const upperIdx = Math.min(15, lowerIdx + 1);
+          const blendFactor = floatIdx - lowerIdx; // 0.0 -> 1.0
+
           const activeIdx = Math.min(15, Math.floor(currentProgress * 15 + 0.35));
           if (typeof updateEraHUD === 'function') {
             updateEraHUD(activeIdx);
           }
 
-          // Update each era plate visibility & opacity based on distance from camera
+          // Continuous Dual-Era Seamless Crossfader (100% Zero Black Frames)
           ERAS.forEach((era, idx) => {
             const group = eraGroups[idx];
             const screen = eraScreens[idx];
             if (!group || !screen) return;
 
-            const dist = evoCamera.position.z - era.camZ;
-
-            // Visibility culling across the 60-unit intervals
-            if (dist > 75 || dist < -15) {
-              group.visible = false;
-            } else {
+            if (idx === lowerIdx) {
               group.visible = true;
-
-              if (dist > 16) {
-                // Approaching from ahead
-                screen.material.opacity = Math.max(0.05, Math.min(1.0, (75 - dist) / 40.0));
-                screen.scale.setScalar(0.94 + (75 - dist) * 0.001);
-              } else if (dist >= 5) {
-                // In prime viewing focus
-                screen.material.opacity = 1.0;
-                const zoomFactor = 1.0 + (16 - dist) * 0.008;
-                screen.scale.setScalar(zoomFactor);
-              } else {
-                // Flying into and through the era plate
-                screen.material.opacity = Math.max(0.0, dist / 5.0);
-                screen.scale.setScalar(1.09);
-              }
+              screen.material.opacity = Math.max(0.0, Math.min(1.0, 1.0 - blendFactor));
+              screen.scale.setScalar(1.0 + blendFactor * 0.06);
+            } else if (idx === upperIdx && lowerIdx !== upperIdx) {
+              group.visible = true;
+              screen.material.opacity = Math.max(0.0, Math.min(1.0, blendFactor));
+              screen.scale.setScalar(0.95 + blendFactor * 0.05);
+            } else {
+              // Culled for 60 FPS mobile performance!
+              group.visible = false;
             }
           });
 
@@ -4842,6 +4971,7 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
           evoCamera.updateProjectionMatrix();
           evoRenderer.setSize(W, H);
           evoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          updateScreenAspectFit();
         });
 
         // ResizeObserver: handles mobile orientation changes & browser chrome resize
@@ -4856,6 +4986,7 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
             evoCamera.updateProjectionMatrix();
             evoRenderer.setSize(W, H);
             evoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            updateScreenAspectFit();
           });
           evoRO.observe(evoCanvas.parentElement);
         }
@@ -4931,16 +5062,165 @@ const evoCanvas = document.getElementById('evolution-webgl-canvas');
       scrubberNodes.forEach((node) => {
         node.addEventListener('click', () => {
           const targetEra = parseInt(node.getAttribute('data-era'), 10);
-          const targetProgress = targetEra / 15;
-          const totalDist = scrollTrack.offsetHeight - window.innerHeight;
-          const scrollTargetY = scrollTrack.offsetTop + (targetProgress * totalDist);
-          window.scrollTo({ top: scrollTargetY, behavior: 'smooth' });
-          targetCamZ = 12 - (targetProgress * 900);
-          if (evoCamera) evoCamera.position.z = targetCamZ;
-          updateEraHUD(targetEra);
-          playUiChirp(600, 1000, 0.08);
+          stepToEra(targetEra);
         });
       });
+
+      // ------------------------------------------------------------------------
+      // 5. INTERACTIVE MOBILE NAVIGATION & AUTO-JOURNEY ENGINE
+      // ------------------------------------------------------------------------
+      let isAutoTourRunning = false;
+      let autoTourRaf = null;
+
+      function stepToEra(targetIdx) {
+        targetIdx = Math.max(0, Math.min(15, targetIdx));
+        const targetProgress = targetIdx / 15;
+        const stickyContainer = document.querySelector('.evolution-viewport-sticky');
+        const viewH = stickyContainer ? stickyContainer.clientHeight : window.innerHeight;
+        const totalDist = scrollTrack.offsetHeight - viewH;
+        const scrollTargetY = scrollTrack.offsetTop + (targetProgress * totalDist);
+
+        window.scrollTo({ top: scrollTargetY, behavior: 'smooth' });
+        targetCamZ = 12 - (targetProgress * 900);
+        if (evoCamera) evoCamera.position.z = targetCamZ;
+        updateEraHUD(targetIdx);
+        playUiChirp(600, 1000, 0.08);
+      }
+      window.stepToEra = stepToEra;
+
+      document.getElementById('era-btn-prev')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        stopAutoTour();
+        stepToEra(currentEraIdx - 1);
+      });
+
+      document.getElementById('era-btn-next')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        stopAutoTour();
+        stepToEra(currentEraIdx + 1);
+      });
+
+      function toggleAutoTour(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (isAutoTourRunning) {
+          stopAutoTour();
+        } else {
+          startAutoTour();
+        }
+      }
+
+      function startAutoTour() {
+        isAutoTourRunning = true;
+        const btn = document.getElementById('era-btn-tour');
+        if (btn) {
+          btn.textContent = '⏸ PAUSE';
+          btn.classList.add('active');
+        }
+        if (currentEraIdx >= 15) {
+          stepToEra(0);
+        }
+        let lastTime = performance.now();
+        function autoTourStep(now) {
+          if (!isAutoTourRunning) return;
+          const dt = Math.min(0.1, (now - lastTime) / 1000);
+          lastTime = now;
+
+          const stickyContainer = document.querySelector('.evolution-viewport-sticky');
+          const viewH = stickyContainer ? stickyContainer.clientHeight : window.innerHeight;
+          const totalDist = scrollTrack.offsetHeight - viewH;
+          const stepPx = (totalDist / 26) * dt; // completes all 16 eras in ~26 seconds
+          const nextY = Math.min(scrollTrack.offsetTop + totalDist, window.scrollY + stepPx);
+          window.scrollTo(0, nextY);
+
+          if (nextY >= scrollTrack.offsetTop + totalDist - 5) {
+            stopAutoTour();
+          } else {
+            autoTourRaf = requestAnimationFrame(autoTourStep);
+          }
+        }
+        autoTourRaf = requestAnimationFrame(autoTourStep);
+        playUiChirp(800, 1400, 0.1);
+      }
+
+      function stopAutoTour() {
+        if (!isAutoTourRunning) return;
+        isAutoTourRunning = false;
+        if (autoTourRaf) cancelAnimationFrame(autoTourRaf);
+        const btn = document.getElementById('era-btn-tour');
+        if (btn) {
+          btn.textContent = '▶ AUTO-TOUR';
+          btn.classList.remove('active');
+        }
+      }
+
+      document.getElementById('era-btn-tour')?.addEventListener('click', toggleAutoTour);
+
+      // Touch Swipe Gesture Navigation on Canvas (Mobile Flick Left/Right)
+      let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+      evoCanvas.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          touchStartTime = Date.now();
+        }
+      }, { passive: true });
+
+      evoCanvas.addEventListener('touchend', (e) => {
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        const dt = Date.now() - touchStartTime;
+
+        if (dt < 450) {
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+            stopAutoTour();
+            if (dx < 0) {
+              stepToEra(currentEraIdx + 1); // Swipe left -> advance
+            } else {
+              stepToEra(currentEraIdx - 1); // Swipe right -> previous
+            }
+          }
+        }
+      }, { passive: true });
+
+      // Stop auto-tour on manual wheel or touch outside nav
+      window.addEventListener('wheel', stopAutoTour, { passive: true });
+      window.addEventListener('touchstart', (e) => {
+        if (e.target.closest('#era-mobile-controls')) return;
+        stopAutoTour();
+      }, { passive: true });
+
+      // Bulletproof Mobile Sticky Viewport Lock (Guarantees zero blank screen in all WebViews)
+      function enforceMobileStickyPin() {
+        if (window.innerWidth > 768) return;
+        const stickyContainer = document.querySelector('.evolution-viewport-sticky');
+        if (!stickyContainer || !scrollTrack) return;
+        const rect = scrollTrack.getBoundingClientRect();
+        const navH = 52;
+        const viewH = window.innerHeight - navH;
+
+        if (rect.top <= navH && rect.bottom >= window.innerHeight) {
+          stickyContainer.style.position = 'fixed';
+          stickyContainer.style.top = navH + 'px';
+          stickyContainer.style.height = viewH + 'px';
+        } else if (rect.bottom < window.innerHeight) {
+          stickyContainer.style.position = 'absolute';
+          stickyContainer.style.top = Math.max(0, scrollTrack.offsetHeight - viewH) + 'px';
+          stickyContainer.style.height = viewH + 'px';
+        } else {
+          stickyContainer.style.position = 'relative';
+          stickyContainer.style.top = '0px';
+          stickyContainer.style.height = viewH + 'px';
+        }
+      }
+      window.addEventListener('scroll', enforceMobileStickyPin, { passive: true });
+      window.addEventListener('resize', enforceMobileStickyPin, { passive: true });
+      enforceMobileStickyPin();
 
       // ========================================================================
       // 4. 3D ROBOTICS KINEMATICS BAY & HOLOGRAPHIC GLSL SHADER (PACK C)
